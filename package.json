@@ -10,7 +10,7 @@
     "build:linux": "electron-builder --linux"
   },
   "author": "Za Stampu",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "xlsx": "^0.18.5"
   },
@@ -30,8 +30,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Za Stampu",
-      "license": "LICENSE.txt"
+      "shortcutName": "Za Stampu"
     },
     "files": [
       "main.js", "preload.js",
