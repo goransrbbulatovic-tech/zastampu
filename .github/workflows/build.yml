@@ -9,20 +9,16 @@ on:
     branches: [ main, master ]
 
 jobs:
-  # ─── BUILD WINDOWS ──────────────────────────────────────────
+
   build-windows:
     runs-on: windows-latest
     name: Build Windows (.exe)
-
     steps:
-      - name: Checkout koda
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Instalacija paketa
         run: npm install
@@ -39,13 +35,11 @@ jobs:
           path: dist/*.exe
           retention-days: 30
 
-      - name: Kompajliranje keygen (Windows)
-        run: |
-          cd keygen
-          g++ keygen.cpp -o keygen.exe -std=c++17 -static -static-libgcc -static-libstdc++
+      - name: Kompajliranje keygen
+        run: cd keygen && g++ keygen.cpp -o keygen.exe -std=c++17 -static -static-libgcc -static-libstdc++
         continue-on-error: true
 
-      - name: Upload keygen (Windows)
+      - name: Upload keygen
         uses: actions/upload-artifact@v4
         with:
           name: keygen-windows
@@ -53,25 +47,18 @@ jobs:
           retention-days: 30
         continue-on-error: true
 
-  # ─── BUILD LINUX ────────────────────────────────────────────
   build-linux:
     runs-on: ubuntu-latest
     name: Build Linux (AppImage)
-
     steps:
-      - name: Checkout koda
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Instalacija sistem paketa
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libnotify-dev libnss3 libxss1 libasound2
 
       - name: Instalacija npm paketa
         run: npm install
@@ -90,81 +77,54 @@ jobs:
             dist/*.deb
           retention-days: 30
 
-      - name: Kompajliranje keygen (Linux)
-        run: |
-          cd keygen
-          g++ keygen.cpp -o keygen -std=c++17
-          chmod +x keygen
+      - name: Kompajliranje keygen
+        run: cd keygen && g++ keygen.cpp -o keygen -std=c++17 && chmod +x keygen
 
-      - name: Upload keygen (Linux)
+      - name: Upload keygen
         uses: actions/upload-artifact@v4
         with:
           name: keygen-linux
           path: keygen/keygen
           retention-days: 30
 
-  # ─── RELEASE (samo na tag v*) ────────────────────────────────
   release:
     needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
     name: Kreiraj GitHub Release
     if: startsWith(github.ref, 'refs/tags/v')
-
     steps:
-      - name: Checkout koda
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Preuzmi Windows artifakt
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: za-stampu-windows
           path: release/windows
 
-      - name: Preuzmi Linux artifakt
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: za-stampu-linux
           path: release/linux
 
-      - name: Preuzmi keygen Windows
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: keygen-windows
           path: release/keygen-win
         continue-on-error: true
 
-      - name: Preuzmi keygen Linux
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: keygen-linux
           path: release/keygen-linux
         continue-on-error: true
 
-      - name: Kreiraj GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           name: "Za Stampu ${{ github.ref_name }}"
-          draft: false
-          prerelease: false
           body: |
-            ## 🖨️ Za Stampu ${{ github.ref_name }}
-
-            ### 📥 Preuzimanje
-
-            | Platforma | Fajl |
-            |---|---|
-            | 🪟 Windows | `Za Stampu Setup x.x.x.exe` |
-            | 🐧 Linux | `Za Stampu-x.x.x.AppImage` |
-            | 🐧 Linux (deb) | `za-stampu_x.x.x_amd64.deb` |
-
-            ### 🔑 Key Generator
-            Alat za generisanje licenci u `keygen-windows.exe` i `keygen-linux`.
-
-            ### 📋 Instalacija
-            1. Preuzmi installer za tvoju platformu
-            2. Pokreni i slijedi upute
-            3. Kontaktiraj prodavača za licencni ključ
-
+            ## Za Stampu ${{ github.ref_name }}
+            ### Preuzimanje
+            - Windows: `Za Stampu Setup 1.0.0.exe`
+            - Linux: `Za Stampu-1.0.0.AppImage`
           files: |
             release/windows/*
             release/linux/*
