@@ -22,6 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Instalacija paketa
         run: npm install
@@ -41,7 +42,7 @@ jobs:
       - name: Kompajliranje keygen (Windows)
         run: |
           cd keygen
-          g++ keygen.cpp -o keygen.exe -std=c++17
+          g++ keygen.cpp -o keygen.exe -std=c++17 -static -static-libgcc -static-libstdc++
         continue-on-error: true
 
       - name: Upload keygen (Windows)
@@ -65,6 +66,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Instalacija sistem paketa
         run: |
