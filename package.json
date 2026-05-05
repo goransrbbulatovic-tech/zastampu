@@ -1,0 +1,42 @@
+{
+  "name": "za-stampu",
+  "version": "1.0.0",
+  "description": "Aplikacija za upravljanje štampom na majicama, šoljama i slično",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
+  },
+  "author": "Za Stampu",
+  "license": "ISC",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.zastampu.app",
+    "productName": "Za Stampu",
+    "icon": "assets/icon.png",
+    "directories": { "output": "dist" },
+    "win": { "target": ["nsis"], "icon": "assets/icon.png" },
+    "linux": { "target": ["AppImage", "deb"], "icon": "assets/icon.png" },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Za Stampu",
+      "license": "LICENSE.txt"
+    },
+    "files": [
+      "main.js", "preload.js",
+      "renderer/**/*", "src/**/*", "assets/**/*",
+      "node_modules/**/*"
+    ]
+  }
+}
